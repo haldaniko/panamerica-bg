@@ -59,3 +59,12 @@ services:
 
 volumes:
   frontend_node_modules:
+
+networks:
+  default:
+    name: panamerica-bg_default
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 172.16.250.0/24
+          gateway: 172.16.250.1
