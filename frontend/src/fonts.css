@@ -1,0 +1,16 @@
+/* Font files copied from the Pan America reference site. */
+@font-face { font-family: 'Helvetica Neue'; src: url('/assets/HelveticaNeueThin.5D5bnMyF.otf') format('opentype'); font-style: normal; font-weight: 100; font-display: swap; }
+@font-face { font-family: 'Helvetica Neue'; src: url('/assets/HelveticaNeueThinItalic.DoFceZUZ.otf') format('opentype'); font-style: italic; font-weight: 100; font-display: swap; }
+@font-face { font-family: 'Helvetica Neue'; src: url('/assets/HelveticaNeueUltraLight.DLTCIc2Q.otf') format('opentype'); font-style: normal; font-weight: 200; font-display: swap; }
+@font-face { font-family: 'Helvetica Neue'; src: url('/assets/HelveticaNeueUltraLightItalic.Cw7AZkO9.otf') format('opentype'); font-style: italic; font-weight: 200; font-display: swap; }
+@font-face { font-family: 'Helvetica Neue'; src: url('/assets/HelveticaNeueLight.Ct5-NwMS.otf') format('opentype'); font-style: normal; font-weight: 300; font-display: swap; }
+@font-face { font-family: 'Helvetica Neue'; src: url('/assets/HelveticaNeueLightItalic.DThesBRY.otf') format('opentype'); font-style: italic; font-weight: 300; font-display: swap; }
+@font-face { font-family: 'Helvetica Neue'; src: url('/assets/HelveticaNeueRoman.CSpBGpqm.otf') format('opentype'); font-style: normal; font-weight: 400; font-display: swap; }
+@font-face { font-family: 'Helvetica Neue'; src: url('/assets/HelveticaNeueItalic.DKx4JyHi.ttf') format('truetype'); font-style: italic; font-weight: 400; font-display: swap; }
+@font-face { font-family: 'Helvetica Neue'; src: url('/assets/HelveticaNeueMediumItalic.DUC78TNQ.otf') format('opentype'); font-style: italic; font-weight: 500; font-display: swap; }
+@font-face { font-family: 'Helvetica Neue'; src: url('/assets/HelveticaNeueBold.CvSAbIAR.otf') format('opentype'); font-style: normal; font-weight: 700; font-display: swap; }
+@font-face { font-family: 'Helvetica Neue'; src: url('/assets/HelveticaNeueBoldItalic.By_AmzKB.otf') format('opentype'); font-style: italic; font-weight: 700; font-display: swap; }
+@font-face { font-family: 'Helvetica Neue'; src: url('/assets/HelveticaNeueHeavy.DAwEujmT.otf') format('opentype'); font-style: normal; font-weight: 800; font-display: swap; }
+@font-face { font-family: 'Helvetica Neue'; src: url('/assets/HelveticaNeueHeavyItalic.DCWHU2wy.otf') format('opentype'); font-style: italic; font-weight: 800; font-display: swap; }
+@font-face { font-family: 'Helvetica Neue'; src: url('/assets/HelveticaNeueBlack.9FyT5aCw.otf') format('opentype'); font-style: normal; font-weight: 900; font-display: swap; }
+@font-face { font-family: 'Helvetica Neue'; src: url('/assets/HelveticaNeueBlackItalic.C7gr1okM.otf') format('opentype'); font-style: italic; font-weight: 900; font-display: swap; }

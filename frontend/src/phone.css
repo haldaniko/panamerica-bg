@@ -1,0 +1,43 @@
+.lead-fields {
+  gap: 0;
+  border: 1px solid #ccc;
+  border-radius: 12px;
+  overflow: hidden;
+}
+
+.lead-fields .phone-prefix {
+  display: flex;
+  align-items: center;
+  padding: 14px 0 14px 14px;
+  color: #555;
+  font: 700 16px 'Helvetica Neue', sans-serif;
+}
+
+.lead-fields input {
+  border: 0;
+  border-radius: 0;
+  padding: 14px 14px 14px 8px;
+  outline: none;
+}
+
+.lead-fields:focus-within {
+  border-color: #d01948;
+  box-shadow: 0 0 0 3px #d019481c;
+}
+
+.bg-phone-code {
+  display: inline-flex;
+  align-items: center;
+  padding: 0 6px 0 4px;
+  color: #333;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+footer nav .nav-item .footer-address {
+  color: inherit;
+  font-size: 16px;
+  font-weight: 500;
+  line-height: 25px;
+  text-align: left;
+}

@@ -1,0 +1,2 @@
+beautifulsoup4==4.15.0
+ftfy==6.3.1
