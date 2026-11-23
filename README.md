@@ -32,7 +32,7 @@ SQLite-база находится в `database/db.sqlite3` на хосте. К�
 docker compose -f docker-compose.prod.yml up --build -d
 ```
 
-По умолчанию страница доступна на http://localhost:8080, React-админка — на http://localhost:8080/admin/. Публикуемый порт меняется напрямую в `docker-compose.prod.yml`. Статические файлы и загруженные изображения раздаёт Nginx, Django обслуживает API через Gunicorn, а SQLite хранится вне контейнеров в `database/db.sqlite3`. Для HTTPS укажите внешний TLS reverse proxy и установите `DJANGO_SECURE_COOKIES=1`.
+По умолчанию страница доступна на http://localhost:8020, React-админка — на http://localhost:8020/admin/, а прямой доступ к Django — на http://localhost:8021. Публикуемые порты меняются напрямую в `docker-compose.prod.yml`. Статические файлы и загруженные изображения раздаёт Nginx, Django обслуживает API через Gunicorn, а SQLite хранится вне контейнеров в `database/db.sqlite3`. Для HTTPS укажите внешний TLS reverse proxy и установите `DJANGO_SECURE_COOKIES=1`.
 
 ## Переменные окружения
 

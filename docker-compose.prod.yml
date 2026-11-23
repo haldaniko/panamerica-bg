@@ -16,6 +16,8 @@ services:
       - ./database:/database
       - static_prod:/app/staticfiles
       - media_prod:/app/media
+    ports:
+      - "8021:8000"
     healthcheck:
       test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8000/health/', timeout=3)"]
       interval: 5s
@@ -49,7 +51,7 @@ services:
       target: production
     restart: unless-stopped
     ports:
-      - "8080:80"
+      - "8020:80"
     volumes:
       - static_prod:/app/staticfiles:ro
       - media_prod:/app/media:ro
