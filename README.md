@@ -22,21 +22,33 @@ docker compose exec backend python manage.py createsuperuser
 
 Для генерации статей скопируйте `.env.sample` в `.env` и задайте `OPENROUTER_API_KEY`. Модель выбирается через `OPENROUTER_MODEL`; по умолчанию используется `openai/gpt-4.1-mini`. После изменения `.env` пересоздайте процессы командой `docker compose up -d --force-recreate backend article-scheduler`. Отдельный контейнер `article-scheduler` проверяет расписание и создаёт первую статью сразу после настройки ключа, затем — раз в 7 дней. Интервал и промпт меняются в разделе «Автоматични статии» админ-панели.
 
-Актуальный SQL-дамп находится в `database/panamerica.sql`. Для восстановления в запущенный контейнер PostgreSQL:
-
-```sh
-docker compose exec -T db psql -U panamerica -d panamerica < database/panamerica.sql
-```
+SQLite-база находится в `database/db.sqlite3` на хосте. Каталог `database/` подключается к backend и планировщику как bind mount, поэтому удаление или пересоздание контейнеров не удаляет данные. Для резервной копии остановите сервисы и скопируйте файл `database/db.sqlite3`.
 
 ## Продакшен
 
-Скопируйте `.env.sample` в `.env`, задайте длинные случайные `POSTGRES_PASSWORD` и `DJANGO_SECRET_KEY`, настройте домен в `DJANGO_ALLOWED_HOSTS` и `CSRF_TRUSTED_ORIGINS`.
+Скопируйте `.env.sample` в `.env`, задайте длинный случайный `DJANGO_SECRET_KEY` и настройте домен в `DJANGO_ALLOWED_HOSTS`.
 
 ```sh
 docker compose -f docker-compose.prod.yml up --build -d
 ```
 
-Страница: http://localhost:8080 (или порт `HTTP_PORT`), React-админка: http://localhost:8080/admin/. Статические файлы и загруженные изображения раздаёт Nginx. Django обслуживает API через Gunicorn; PostgreSQL и изображения хранятся в отдельных томах. Для HTTPS укажите внешний TLS reverse proxy и установите `DJANGO_SECURE_COOKIES=1`.
+По умолчанию страница доступна на http://localhost:8080, React-админка — на http://localhost:8080/admin/. Публикуемый порт меняется напрямую в `docker-compose.prod.yml`. Статические файлы и загруженные изображения раздаёт Nginx, Django обслуживает API через Gunicorn, а SQLite хранится вне контейнеров в `database/db.sqlite3`. Для HTTPS укажите внешний TLS reverse proxy и установите `DJANGO_SECURE_COOKIES=1`.
+
+## Переменные окружения
+
+| Переменная | Назначение |
+| --- | --- |
+| `DJANGO_SECRET_KEY` | Секрет Django для подписи сессий и защитных токенов. В production обязательно замените пример длинной случайной строкой. |
+| `DJANGO_ALLOWED_HOSTS` | Разрешённые домены через запятую, без протокола и пути, например `example.com,www.example.com`. |
+| `DJANGO_SECURE_COOKIES` | `1` разрешает отправку cookies сессии и CSRF только по HTTPS; для локальной разработки используется `0`. |
+| `OPENROUTER_API_KEY` | API-ключ OpenRouter для автоматической генерации статей. Можно оставить пустым, если генерация отключена. |
+| `OPENROUTER_MODEL` | Идентификатор модели OpenRouter, которая создаёт статьи. |
+| `OPENROUTER_BASE_URL` | Адрес API OpenRouter; обычно менять не требуется. |
+| `OPENROUTER_SITE_URL` | Публичный адрес сайта, передаваемый OpenRouter в заголовке `HTTP-Referer`. |
+| `OPENROUTER_APP_NAME` | Название приложения, передаваемое OpenRouter в заголовке `X-Title`. |
+| `ARTICLE_SCHEDULER_POLL_SECONDS` | Период проверки расписания генерации в секундах; Django применяет минимум 30 секунд. |
+
+Путь к базе и внешние порты намеренно не задаются через `.env`: SQLite подключается из `./database`, а порты меняются непосредственно в compose-файлах.
 
 ## Структура
 
@@ -45,7 +57,7 @@ docker compose -f docker-compose.prod.yml up --build -d
 - `frontend/src/admin/` — React-админка на болгарском.
 - `frontend/public/assets/` — локальные изображения, шрифты и видео.
 - `backend/content/` — модели, API, админка и исходные данные для первого запуска.
-- `database/panamerica.sql` — дамп текущей PostgreSQL-базы с данными.
+- `database/db.sqlite3` — текущая SQLite-база, подключаемая к контейнерам с хоста.
 - `scripts/localize_reference_bg.py`, `scripts/localize_data_bg.py` — воспроизводимая локализация исходного референса.
 - `/api/cars/`, `/api/reviews/`, `/api/articles/`, `/api/website-settings/` — публичное редактируемое содержимое; `POST /api/leads/` — заявка.
 

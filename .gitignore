@@ -7,6 +7,9 @@ backend/staticfiles/
 backend/media/
 frontend/node_modules/
 frontend/dist/
+database/*.sqlite3-wal
+database/*.sqlite3-shm
+database/*.sqlite3-journal
 .chrome-*/
 *-check*.png
 original-privacy.png
