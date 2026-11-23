@@ -20,11 +20,17 @@ docker compose exec backend python manage.py createsuperuser
 
 В React-админку войдите учётной записью, созданной через `createsuperuser`. В ней можно добавлять, редактировать, скрывать и удалять автомобили, отзывы и статьи, настраивать телефон, email и адрес сайта, управлять промптом и периодичностью генерации, запускать генерацию вручную, загружать изображения и просматривать заявки. Доступ к изменению данных есть только у суперпользователей Django. Запросы защищены сессией и CSRF.
 
-Для генерации статей скопируйте `.env.example` в `.env` и задайте `OPENROUTER_API_KEY`. Модель выбирается через `OPENROUTER_MODEL`; по умолчанию используется `openai/gpt-4.1-mini`. После изменения `.env` пересоздайте процессы командой `docker compose up -d --force-recreate backend article-scheduler`. Отдельный контейнер `article-scheduler` проверяет расписание и создаёт первую статью сразу после настройки ключа, затем — раз в 7 дней. Интервал и промпт меняются в разделе «Автоматични статии» админ-панели.
+Для генерации статей скопируйте `.env.sample` в `.env` и задайте `OPENROUTER_API_KEY`. Модель выбирается через `OPENROUTER_MODEL`; по умолчанию используется `openai/gpt-4.1-mini`. После изменения `.env` пересоздайте процессы командой `docker compose up -d --force-recreate backend article-scheduler`. Отдельный контейнер `article-scheduler` проверяет расписание и создаёт первую статью сразу после настройки ключа, затем — раз в 7 дней. Интервал и промпт меняются в разделе «Автоматични статии» админ-панели.
+
+Актуальный SQL-дамп находится в `database/panamerica.sql`. Для восстановления в запущенный контейнер PostgreSQL:
+
+```sh
+docker compose exec -T db psql -U panamerica -d panamerica < database/panamerica.sql
+```
 
 ## Продакшен
 
-Скопируйте `.env.example` в `.env`, задайте длинные случайные `POSTGRES_PASSWORD` и `DJANGO_SECRET_KEY`, настройте домен в `DJANGO_ALLOWED_HOSTS` и `CSRF_TRUSTED_ORIGINS`.
+Скопируйте `.env.sample` в `.env`, задайте длинные случайные `POSTGRES_PASSWORD` и `DJANGO_SECRET_KEY`, настройте домен в `DJANGO_ALLOWED_HOSTS` и `CSRF_TRUSTED_ORIGINS`.
 
 ```sh
 docker compose -f docker-compose.prod.yml up --build -d
@@ -39,6 +45,7 @@ docker compose -f docker-compose.prod.yml up --build -d
 - `frontend/src/admin/` — React-админка на болгарском.
 - `frontend/public/assets/` — локальные изображения, шрифты и видео.
 - `backend/content/` — модели, API, админка и исходные данные для первого запуска.
+- `database/panamerica.sql` — дамп текущей PostgreSQL-базы с данными.
 - `scripts/localize_reference_bg.py`, `scripts/localize_data_bg.py` — воспроизводимая локализация исходного референса.
 - `/api/cars/`, `/api/reviews/`, `/api/articles/`, `/api/website-settings/` — публичное редактируемое содержимое; `POST /api/leads/` — заявка.
 
