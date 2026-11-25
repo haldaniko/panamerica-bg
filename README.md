@@ -40,6 +40,7 @@ docker compose -f docker-compose.prod.yml up --build -d
 | --- | --- |
 | `DJANGO_SECRET_KEY` | Секрет Django для подписи сессий и защитных токенов. В production обязательно замените пример длинной случайной строкой. |
 | `DJANGO_ALLOWED_HOSTS` | Разрешённые домены через запятую, без протокола и пути, например `example.com,www.example.com`. |
+| `DJANGO_CSRF_TRUSTED_ORIGINS` | Публичные HTTPS-адреса сайта через запятую, включая протокол, например `https://example.com,https://www.example.com`. |
 | `DJANGO_SECURE_COOKIES` | `1` разрешает отправку cookies сессии и CSRF только по HTTPS; для локальной разработки используется `0`. |
 | `OPENROUTER_API_KEY` | API-ключ OpenRouter для автоматической генерации статей. Можно оставить пустым, если генерация отключена. |
 | `OPENROUTER_MODEL` | Идентификатор модели OpenRouter, которая создаёт статьи. |

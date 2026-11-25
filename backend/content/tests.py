@@ -4,7 +4,8 @@ import tempfile
 from unittest.mock import patch
 
 from django.contrib.auth import get_user_model
-from django.test import Client, TestCase
+from django.core.management import call_command
+from django.test import Client, TestCase, override_settings
 from django.core.files.uploadedfile import SimpleUploadedFile
 from PIL import Image
 
@@ -38,6 +39,28 @@ class ReactAdminAPITests(TestCase):
         self.assertEqual(deleted.status_code, 204)
         self.assertFalse(Car.objects.filter(pk=car_id).exists())
 
+    @override_settings(
+        ALLOWED_HOSTS=['panamerica.bg'],
+        CSRF_TRUSTED_ORIGINS=['https://panamerica.bg'],
+    )
+    def test_admin_login_accepts_proxied_production_https_origin(self):
+        token = self.client.get(
+            '/api/auth/csrf/',
+            HTTP_HOST='panamerica.bg',
+            HTTP_X_FORWARDED_PROTO='https',
+        ).json()['csrfToken']
+        response = self.client.post(
+            '/api/auth/login/',
+            json.dumps({'username': 'editor', 'password': 'test-password'}),
+            content_type='application/json',
+            HTTP_HOST='panamerica.bg',
+            HTTP_ORIGIN='https://panamerica.bg',
+            HTTP_REFERER='https://panamerica.bg/admin',
+            HTTP_X_FORWARDED_PROTO='https',
+            HTTP_X_CSRFTOKEN=token,
+        )
+        self.assertEqual(response.status_code, 200, response.content)
+
     def test_car_detail_is_public_and_all_fields_are_managed_in_admin(self):
         car = Car.objects.create(
             name='FORD MUSTANG GT', year=2021, price_eur=24500, image='1.png',
@@ -69,6 +92,14 @@ class ReactAdminAPITests(TestCase):
         car.is_active = False
         car.save()
         self.assertEqual(self.client.get(f'/api/cars/{car.slug}/').status_code, 404)
+
+    def test_seed_content_creates_cars_with_unique_slugs_and_demo_details(self):
+        call_command('seed_content', verbosity=0)
+        cars = list(Car.objects.order_by('position'))
+        self.assertEqual(len(cars), 10)
+        self.assertEqual(len({car.slug for car in cars}), 10)
+        self.assertTrue(all(car.summary and car.description and car.features for car in cars))
+        self.assertEqual(cars[0].slug, 'jeep-grand-cherokee')
 
     def test_staff_without_superuser_cannot_sign_in(self):
         get_user_model().objects.create_user(username='staff', password='test-password', is_staff=True)

@@ -12,5 +12,9 @@ class Command(BaseCommand):
             if model.objects.exists():
                 self.stdout.write(f'{key}: already populated')
                 continue
-            model.objects.bulk_create(model(position=i, **item) for i, item in enumerate(data[key]))
+            if model is Car:
+                for i, item in enumerate(data[key]):
+                    model.objects.create(position=i, **item)
+            else:
+                model.objects.bulk_create(model(position=i, **item) for i, item in enumerate(data[key]))
             self.stdout.write(f'{key}: {len(data[key])} loaded')

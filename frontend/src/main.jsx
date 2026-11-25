@@ -168,19 +168,23 @@ function DataSection({ html, section, children, selector = '.simple-carousel__tr
     let suppressClick = false
     const onPointerDown = event => {
       if (event.pointerType !== 'mouse' || event.button !== 0) return
-      drag = { x: event.clientX, left: target.scrollLeft, moved: false }
+      drag = { x: event.clientX, left: target.scrollLeft, moved: false, pointerId: event.pointerId }
       paused = true
-      target.classList.add('is-dragging')
-      target.setPointerCapture(event.pointerId)
     }
     const onPointerMove = event => {
       if (!drag) return
-      if (Math.abs(event.clientX - drag.x) > 6) drag.moved = true
+      if (!drag.moved && Math.abs(event.clientX - drag.x) > 6) {
+        drag.moved = true
+        target.classList.add('is-dragging')
+        target.setPointerCapture(drag.pointerId)
+      }
+      if (!drag.moved) return
       target.scrollLeft = drag.left - (event.clientX - drag.x)
     }
     const onPointerUp = () => {
       if (!drag) return
       suppressClick = drag.moved
+      if (target.hasPointerCapture(drag.pointerId)) target.releasePointerCapture(drag.pointerId)
       drag = null
       target.classList.remove('is-dragging')
       paused = false
@@ -301,17 +305,22 @@ function nationalPhone(value) {
   return digits.slice(0, 9)
 }
 
-function LeadModal({ onClose, initialPhone = '' }) {
+function LeadModal({ onClose, initialPhone = '', source = 'website', vehicle = '' }) {
   const [phone, setPhone] = useState(() => nationalPhone(initialPhone))
   const [state, setState] = useState('idle')
   const [error, setError] = useState('')
+  useEffect(() => {
+    const closeOnEscape = event => event.key === 'Escape' && onClose()
+    document.addEventListener('keydown', closeOnEscape)
+    return () => document.removeEventListener('keydown', closeOnEscape)
+  }, [onClose])
   async function submit(e) {
     e.preventDefault()
     setState('sending'); setError('')
     try {
       const national = nationalPhone(phone)
       if (national.length < 8) throw new Error('Въведете валиден български телефонен номер.')
-      const response = await fetch('/api/leads/', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ phone: `+359${national}`, source: 'website' }) })
+      const response = await fetch('/api/leads/', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ phone: `+359${national}`, source }) })
       if (!response.ok) throw new Error('Проверете телефонния номер и опитайте отново.')
       setState('sent')
     } catch (err) { setError(err.message); setState('idle') }
@@ -319,7 +328,7 @@ function LeadModal({ onClose, initialPhone = '' }) {
   return <div className="lead-overlay" onMouseDown={e => e.target === e.currentTarget && onClose()}>
     <div className="lead-modal" role="dialog" aria-modal="true" aria-labelledby="lead-title">
       <button className="lead-close" aria-label="Затвори" onClick={onClose}>×</button>
-      {state === 'sent' ? <><h2 id="lead-title">Благодарим!</h2><p>Скоро ще се свържем с вас.</p></> : <><h2 id="lead-title">Да ви се обадим</h2><p>Оставете български телефонен номер и наш специалист ще се свърже с вас.</p><form onSubmit={submit}><div className="lead-fields"><span className="phone-prefix">+359</span><input type="tel" inputMode="tel" aria-label="Български телефонен номер" placeholder="88 123 4567" minLength="8" maxLength="12" required value={phone} onChange={e => setPhone(nationalPhone(e.target.value))} /></div>{error && <p className="lead-error" role="alert">{error}</p>}<button type="submit" disabled={state === 'sending'}>{state === 'sending' ? 'Изпращане…' : 'Изпратете запитване'}</button></form></>}
+      {state === 'sent' ? <><h2 id="lead-title">Благодарим!</h2><p>Скоро ще се свържем с вас.</p></> : <><h2 id="lead-title">{vehicle ? `Запитване за ${vehicle}` : 'Да ви се обадим'}</h2><p>Оставете български телефонен номер и наш специалист ще се свърже с вас.</p><form onSubmit={submit}><div className="lead-fields"><span className="phone-prefix">+359</span><input type="tel" inputMode="tel" aria-label="Български телефонен номер" placeholder="88 123 4567" minLength="8" maxLength="12" required value={phone} onChange={e => setPhone(nationalPhone(e.target.value))} /></div>{error && <p className="lead-error" role="alert">{error}</p>}<button type="submit" disabled={state === 'sending'}>{state === 'sending' ? 'Изпращане…' : 'Изпратете запитване'}</button></form></>}
     </div>
   </div>
 }
@@ -454,6 +463,7 @@ function CarPage({ slug }) {
   const [car, setCar] = useState(null)
   const [websiteSettings, setWebsiteSettings] = useState(null)
   const [notFound, setNotFound] = useState(false)
+  const [showLeadModal, setShowLeadModal] = useState(false)
   useEffect(() => {
     Promise.allSettled([
       fetch(`/api/cars/${encodeURIComponent(slug)}/`).then(response => {
@@ -486,7 +496,6 @@ function CarPage({ slug }) {
   ].filter(([, value]) => value !== null && value !== '') : []
   const features = car?.features.split(/\r?\n|,/).map(item => item.trim()).filter(Boolean) || []
   const description = car?.description.split(/\n\s*\n/).map(item => item.trim()).filter(Boolean) || []
-  const contact = websiteSettings || defaultWebsiteSettings
   return <div className="container" data-v-23ebea15="">
     <ReferenceSection html={header} section="header" websiteSettings={websiteSettings} />
     <main className="car-page">
@@ -500,8 +509,7 @@ function CarPage({ slug }) {
             {car.summary && <p className="car-detail-summary">{car.summary}</p>}
             <p className="car-detail-price">€ {car.price_eur.toLocaleString('bg-BG')}</p>
             <div className="car-detail-actions">
-              <a className="car-detail-primary" href={`tel:${contact.phone.replace(/[^+\d]/g, '')}`}>Обадете ни се</a>
-              <a className="car-detail-secondary" href={`mailto:${contact.email}?subject=${encodeURIComponent(car.name)}`}>Изпратете запитване</a>
+              <button className="car-detail-secondary" type="button" onClick={() => setShowLeadModal(true)}>Изпратете запитване</button>
             </div>
           </div>
         </div>
@@ -511,6 +519,7 @@ function CarPage({ slug }) {
       </article> : <div className="article-loading">Зареждане…</div>}
     </main>
     <ReferenceSection html={footer} section="footer" websiteSettings={websiteSettings} />
+    {showLeadModal && car && <LeadModal source={`car:${car.slug}`} vehicle={car.name} onClose={() => setShowLeadModal(false)} />}
   </div>
 }
 
