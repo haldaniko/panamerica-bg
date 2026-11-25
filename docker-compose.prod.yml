@@ -5,7 +5,7 @@ services:
     environment:
       DJANGO_DEBUG: "0"
       DJANGO_SECRET_KEY: ${DJANGO_SECRET_KEY:?Set DJANGO_SECRET_KEY in .env}
-      DJANGO_ALLOWED_HOSTS: ${DJANGO_ALLOWED_HOSTS:-localhost,127.0.0.1}
+      DJANGO_ALLOWED_HOSTS: localhost,127.0.0.1,backend,${DJANGO_ALLOWED_HOSTS:-panamerica.bg,www.panamerica.bg}
       DJANGO_CSRF_TRUSTED_ORIGINS: ${DJANGO_CSRF_TRUSTED_ORIGINS:-https://panamerica.bg,https://www.panamerica.bg}
       DJANGO_SECURE_COOKIES: ${DJANGO_SECURE_COOKIES:-1}
       OPENROUTER_API_KEY: ${OPENROUTER_API_KEY:-}
@@ -32,7 +32,7 @@ services:
     environment:
       DJANGO_DEBUG: "0"
       DJANGO_SECRET_KEY: ${DJANGO_SECRET_KEY:?Set DJANGO_SECRET_KEY in .env}
-      DJANGO_ALLOWED_HOSTS: ${DJANGO_ALLOWED_HOSTS:-localhost,127.0.0.1}
+      DJANGO_ALLOWED_HOSTS: localhost,127.0.0.1,backend,${DJANGO_ALLOWED_HOSTS:-panamerica.bg,www.panamerica.bg}
       DJANGO_CSRF_TRUSTED_ORIGINS: ${DJANGO_CSRF_TRUSTED_ORIGINS:-https://panamerica.bg,https://www.panamerica.bg}
       DJANGO_SECURE_COOKIES: ${DJANGO_SECURE_COOKIES:-1}
       OPENROUTER_API_KEY: ${OPENROUTER_API_KEY:-}
